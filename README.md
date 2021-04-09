@@ -1,3 +1,6 @@
+# Fork
+The main purpose of this fork is to _NEVER EVER_ use trigger_error() because it breaks unit tests and is slower than simply type hinting instead.
+
 # JWT
 [![Gitter]](https://gitter.im/lcobucci/jwt?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Total Downloads]](https://packagist.org/packages/lcobucci/jwt)

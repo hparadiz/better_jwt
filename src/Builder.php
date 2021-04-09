@@ -25,7 +25,6 @@ use function current;
 use function in_array;
 use function is_array;
 use function is_bool;
-use function trigger_error;
 use const E_USER_DEPRECATED;
 
 /**
@@ -148,31 +147,16 @@ class Builder
     /**
      * Configures the expiration time
      *
-     * @param int|DateTimeImmutable $expiration
+     * @param DateTimeImmutable $expiration
      * @param boolean $replicateAsHeader
      *
      * @return Builder
      */
-    public function expiresAt($expiration, $replicateAsHeader = false)
+    public function expiresAt(DateTimeImmutable $expiration, $replicateAsHeader = false)
     {
-        return $this->setRegisteredClaim('exp', $this->convertToDate($expiration), $replicateAsHeader);
+        return $this->setRegisteredClaim('exp', $expiration, $replicateAsHeader);
     }
 
-    /**
-     * @param int|DateTimeImmutable $value
-     *
-     * @return DateTimeImmutable
-     */
-    private function convertToDate($value)
-    {
-        if (! $value instanceof DateTimeImmutable) {
-            trigger_error('Using integers for registered date claims is deprecated, please use DateTimeImmutable objects instead.', E_USER_DEPRECATED);
-
-            return new DateTimeImmutable('@' . $value);
-        }
-
-        return $value;
-    }
 
     /**
      * Configures the expiration time
@@ -180,12 +164,12 @@ class Builder
      * @deprecated This method will be removed on v4
      * @see Builder::expiresAt()
      *
-     * @param int|DateTimeImmutable $expiration
+     * @param DateTimeImmutable $expiration
      * @param boolean $replicateAsHeader
      *
      * @return Builder
      */
-    public function setExpiration($expiration, $replicateAsHeader = false)
+    public function setExpiration(DateTimeImmutable $expiration, $replicateAsHeader = false)
     {
         return $this->expiresAt($expiration, $replicateAsHeader);
     }
@@ -227,9 +211,9 @@ class Builder
      *
      * @return Builder
      */
-    public function issuedAt($issuedAt, $replicateAsHeader = false)
+    public function issuedAt(DateTimeImmutable $issuedAt, $replicateAsHeader = false)
     {
-        return $this->setRegisteredClaim('iat', $this->convertToDate($issuedAt), $replicateAsHeader);
+        return $this->setRegisteredClaim('iat', $issuedAt, $replicateAsHeader);
     }
 
     /**
@@ -285,9 +269,9 @@ class Builder
      *
      * @return Builder
      */
-    public function canOnlyBeUsedAfter($notBefore, $replicateAsHeader = false)
+    public function canOnlyBeUsedAfter(DateTimeImmutable $notBefore, $replicateAsHeader = false)
     {
-        return $this->setRegisteredClaim('nbf', $this->convertToDate($notBefore), $replicateAsHeader);
+        return $this->setRegisteredClaim('nbf', $notBefore, $replicateAsHeader);
     }
 
     /**
@@ -348,11 +332,8 @@ class Builder
     {
         $this->configureClaim($name, $value);
 
-        if ($replicate) {
-            trigger_error('Replicating claims as headers is deprecated and will removed from v4.0. Please manually set the header if you need it replicated.', E_USER_DEPRECATED);
 
-            $this->headers[$name] = $value;
-        }
+        $this->headers[$name] = $value;
 
         return $this;
     }
@@ -429,10 +410,6 @@ class Builder
      */
     public function withClaim($name, $value)
     {
-        if (in_array($name, RegisteredClaims::ALL, true)) {
-            trigger_error('The use of the method "withClaim" is deprecated for registered claims. Please use dedicated method instead.', E_USER_DEPRECATED);
-        }
-
         return $this->forwardCallToCorrectClaimMethod($name, $value);
     }
 
@@ -486,8 +463,6 @@ class Builder
     public function sign(Signer $signer, $key)
     {
         if (! $key instanceof Key) {
-            trigger_error('Implicit conversion of keys from strings is deprecated. Please use InMemory or LocalFileReference classes.', E_USER_DEPRECATED);
-
             $key = new Key($key);
         }
 
@@ -520,10 +495,6 @@ class Builder
      */
     public function getToken(Signer $signer = null, Key $key = null)
     {
-        if ($signer === null || $key === null) {
-            trigger_error('Not specifying the signer and key to Builder#getToken() is deprecated. Please move the arguments from Builder#sign() to Builder#getToken().', E_USER_DEPRECATED);
-        }
-
         $signer = $signer ?: $this->signer;
         $key = $key ?: $this->key;
 

@@ -21,7 +21,6 @@ use function func_num_args;
 use function in_array;
 use function is_array;
 use function sprintf;
-use function trigger_error;
 use const E_USER_DEPRECATED;
 
 /**
@@ -232,9 +231,6 @@ class Token
         }
 
         if ($name === RegisteredClaims::AUDIENCE && is_array($value)) {
-            if (count($value) > 1) {
-                trigger_error('You will only get the first array entry as a string. Use Token::claims()->get() instead.', E_USER_DEPRECATED);
-            }
             return current($value);
         }
 
@@ -293,10 +289,6 @@ class Token
     {
         if (! $this->claims->has('exp')) {
             return false;
-        }
-
-        if ($now === null) {
-            trigger_error('Not providing the current time is deprecated. Please pass an instance of DateTimeInterface.', E_USER_DEPRECATED);
         }
 
         $now = $now ?: new DateTimeImmutable();
